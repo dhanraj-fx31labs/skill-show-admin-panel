@@ -21,7 +21,7 @@ function findAuthByPath(path: string): string[] {
 	return foundItem?.auth || [];
 }
 
-const navData = GLOBAL_CONFIG.routerMode === "frontend" ? clone(frontendNavData) : backendNavData;
+const navData = GLOBAL_CONFIG.routerMode === "module" ? clone(frontendNavData) : backendNavData;
 const allItems = navData.reduce((acc: any[], group) => {
 	const flattenedItems = flattenTrees(group.items);
 	return concat(acc, flattenedItems);

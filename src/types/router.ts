@@ -19,6 +19,10 @@ export interface RouteMeta {
 	 */
 	info?: ReactNode;
 	/**
+	 * menu suffix (e.g., new feature tag)
+	 */
+	suffix?: ReactNode;
+	/**
 	 * hide in menu
 	 */
 	hideMenu?: boolean;

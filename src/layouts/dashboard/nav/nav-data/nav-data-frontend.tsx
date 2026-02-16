@@ -8,12 +8,12 @@ export const frontendNavData: NavProps["data"] = [
 		items: [
 			{
 				title: "sys.nav.workbench",
-				path: "/workbench",
+				path: "/dashboard/workbench",
 				icon: <Icon icon="local:ic-workbench" size="24" />,
 			},
 			{
 				title: "sys.nav.analysis",
-				path: "/analysis",
+				path: "/dashboard/analysis",
 				icon: <Icon icon="local:ic-analysis" size="24" />,
 			},
 		],

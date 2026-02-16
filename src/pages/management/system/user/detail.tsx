@@ -1,4 +1,4 @@
-import { useParams } from "@/routes/hooks";
+import { useParams } from "@/router/hooks";
 import { Card, CardContent } from "@/ui/card";
 import type { UserInfo } from "#/entity";
 

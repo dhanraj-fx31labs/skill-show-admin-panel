@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import type { Menu, Permission, Role, User } from "#/entity";
+import type { Menu, Permission } from "#/entity";
 import { PermissionType } from "#/enum";
 
 const { GROUP, MENU, CATALOGUE } = PermissionType;
@@ -19,7 +19,7 @@ export const DB_MENU: Menu[] = [
 		code: "workbench",
 		icon: "local:ic-workbench",
 		type: MENU,
-		path: "/workbench",
+		path: "/dashboard/workbench",
 		component: "/pages/dashboard/workbench",
 	},
 	{
@@ -29,7 +29,7 @@ export const DB_MENU: Menu[] = [
 		code: "analysis",
 		icon: "local:ic-analysis",
 		type: MENU,
-		path: "/analysis",
+		path: "/dashboard/analysis",
 		component: "/pages/dashboard/analysis",
 	},
 
@@ -44,7 +44,14 @@ export const DB_MENU: Menu[] = [
 		type: CATALOGUE,
 		path: "/management",
 	},
-	{ id: "management_user", parentId: "management", name: "sys.nav.user.index", code: "management:user", type: CATALOGUE, path: "/management/user" },
+	{
+		id: "management_user",
+		parentId: "management",
+		name: "sys.nav.user.index",
+		code: "management:user",
+		type: CATALOGUE,
+		path: "/management/user",
+	},
 	{
 		id: "management_user_profile",
 		parentId: "management_user",
@@ -63,7 +70,14 @@ export const DB_MENU: Menu[] = [
 		path: "management/user/account",
 		component: "/pages/management/user/account",
 	},
-	{ id: "management_system", parentId: "management", name: "sys.nav.system.index", code: "management:system", type: CATALOGUE, path: "management/system" },
+	{
+		id: "management_system",
+		parentId: "management",
+		name: "sys.nav.system.index",
+		code: "management:system",
+		type: CATALOGUE,
+		path: "management/system",
+	},
 	{
 		id: "management_system_user",
 		parentId: "management_system",
@@ -155,10 +169,42 @@ export const DB_MENU: Menu[] = [
 		component: "/pages/menu-level/menu-level-1b/menu-level-2b/menu-level-3b",
 	},
 	// erros
-	{ id: "error", parentId: "group_pages", name: "sys.nav.error.index", code: "error", icon: "bxs:error-alt", type: CATALOGUE, path: "/error" },
-	{ id: "error_403", parentId: "error", name: "sys.nav.error.403", code: "error:403", type: MENU, path: "/error/403", component: "/pages/sys/error/Page403" },
-	{ id: "error_404", parentId: "error", name: "sys.nav.error.404", code: "error:404", type: MENU, path: "/error/404", component: "/pages/sys/error/Page404" },
-	{ id: "error_500", parentId: "error", name: "sys.nav.error.500", code: "error:500", type: MENU, path: "/error/500", component: "/pages/sys/error/Page500" },
+	{
+		id: "error",
+		parentId: "group_pages",
+		name: "sys.nav.error.index",
+		code: "error",
+		icon: "bxs:error-alt",
+		type: CATALOGUE,
+		path: "/error",
+	},
+	{
+		id: "error_403",
+		parentId: "error",
+		name: "sys.nav.error.403",
+		code: "error:403",
+		type: MENU,
+		path: "/error/403",
+		component: "/pages/sys/error/Page403",
+	},
+	{
+		id: "error_404",
+		parentId: "error",
+		name: "sys.nav.error.404",
+		code: "error:404",
+		type: MENU,
+		path: "/error/404",
+		component: "/pages/sys/error/Page404",
+	},
+	{
+		id: "error_500",
+		parentId: "error",
+		name: "sys.nav.error.500",
+		code: "error:500",
+		type: MENU,
+		path: "/error/500",
+		component: "/pages/sys/error/Page500",
+	},
 
 	// group_ui
 	// components
@@ -319,8 +365,25 @@ export const DB_MENU: Menu[] = [
 		disabled: true,
 		component: "/pages/sys/others/disabled",
 	},
-	{ id: "label", parentId: "group_others", name: "sys.nav.label", code: "label", icon: "local:ic-label", type: MENU, path: "#label", info: "New" },
-	{ id: "link", parentId: "group_others", name: "sys.nav.link", code: "link", icon: "local:ic-external", type: CATALOGUE, path: "/link" },
+	{
+		id: "label",
+		parentId: "group_others",
+		name: "sys.nav.label",
+		code: "label",
+		icon: "local:ic-label",
+		type: MENU,
+		path: "#label",
+		info: "New",
+	},
+	{
+		id: "link",
+		parentId: "group_others",
+		name: "sys.nav.link",
+		code: "link",
+		icon: "local:ic-external",
+		type: CATALOGUE,
+		path: "/link",
+	},
 	{
 		id: "link_external",
 		parentId: "link",
@@ -353,35 +416,211 @@ export const DB_MENU: Menu[] = [
 	},
 ];
 
-export const DB_USER: User[] = [
-	{ id: "user_admin_id", username: "admin", password: "demo1234", avatar: faker.image.avatarGitHub(), email: "admin@slash.com" },
-	{ id: "user_test_id", username: "test", password: "demo1234", avatar: faker.image.avatarGitHub(), email: "test@slash.com" },
-	{ id: "user_guest_id", username: "guest", password: "demo1234", avatar: faker.image.avatarGitHub(), email: "guest@slash.com" },
-];
+/**
+ * Permission mock (dj-front style: id-based grouping, parentId references parent id)
+ */
+const DASHBOARD_PERMISSION: Permission = {
+	id: "9100714781927703",
+	parentId: "",
+	label: "sys.menu.dashboard",
+	name: "Dashboard",
+	icon: "local:ic-analysis",
+	type: CATALOGUE,
+	route: "dashboard",
+	order: 1,
+	children: [
+		{
+			id: "8426999229400979",
+			parentId: "9100714781927703",
+			label: "sys.menu.workbench",
+			name: "Workbench",
+			type: MENU,
+			route: "workbench",
+			component: "/pages/dashboard/workbench",
+		},
+		{
+			id: "9710971640510357",
+			parentId: "9100714781927703",
+			label: "sys.menu.analysis",
+			name: "Analysis",
+			type: MENU,
+			route: "analysis",
+			component: "/pages/dashboard/analysis",
+		},
+	],
+};
+const MANAGEMENT_PERMISSION: Permission = {
+	id: "0901673425580518",
+	parentId: "",
+	label: "sys.menu.management",
+	name: "Management",
+	icon: "local:ic-management",
+	type: CATALOGUE,
+	route: "management",
+	order: 2,
+	children: [
+		{
+			id: "2781684678535711",
+			parentId: "0901673425580518",
+			label: "sys.menu.user.index",
+			name: "User",
+			type: CATALOGUE,
+			route: "user",
+			children: [
+				{
+					id: "4754063958766648",
+					parentId: "2781684678535711",
+					label: "sys.menu.user.profile",
+					name: "Profile",
+					type: MENU,
+					route: "profile",
+					component: "/pages/management/user/profile",
+				},
+				{
+					id: "2516598794787938",
+					parentId: "2781684678535711",
+					label: "sys.menu.user.account",
+					name: "Account",
+					type: MENU,
+					route: "account",
+					component: "/pages/management/user/account",
+				},
+			],
+		},
+		{
+			id: "0249937641030250",
+			parentId: "0901673425580518",
+			label: "sys.menu.system.index",
+			name: "System",
+			type: CATALOGUE,
+			route: "system",
+			children: [
+				{
+					id: "4359580910369984",
+					parentId: "0249937641030250",
+					label: "sys.menu.system.permission",
+					name: "Permission",
+					type: MENU,
+					route: "permission",
+					component: "/pages/management/system/permission",
+				},
+				{
+					id: "1689241785490759",
+					parentId: "0249937641030250",
+					label: "sys.menu.system.role",
+					name: "Role",
+					type: MENU,
+					route: "role",
+					component: "/pages/management/system/role",
+				},
+				{
+					id: "0157880245365433",
+					parentId: "0249937641030250",
+					label: "sys.menu.system.user",
+					name: "User",
+					type: MENU,
+					route: "user",
+					component: "/pages/management/system/user",
+				},
+				{
+					id: "0157880245365434",
+					parentId: "0249937641030250",
+					label: "sys.menu.system.user_detail",
+					name: "User Detail",
+					type: MENU,
+					route: "user/:id",
+					component: "/pages/management/system/user/detail",
+					hide: true,
+				},
+			],
+		},
+	],
+};
+const ERRORS_PERMISSION: Permission = {
+	id: "9406067785553476",
+	parentId: "",
+	label: "sys.menu.error.index",
+	name: "Error",
+	icon: "bxs:error-alt",
+	type: CATALOGUE,
+	route: "error",
+	order: 6,
+	children: [
+		{
+			id: "8557056851997154",
+			parentId: "9406067785553476",
+			label: "sys.menu.error.403",
+			name: "403",
+			type: MENU,
+			route: "403",
+			component: "/pages/sys/error/Page403",
+		},
+		{
+			id: "5095669208159005",
+			parentId: "9406067785553476",
+			label: "sys.menu.error.404",
+			name: "404",
+			type: MENU,
+			route: "404",
+			component: "/pages/sys/error/Page404",
+		},
+		{
+			id: "0225992135973772",
+			parentId: "9406067785553476",
+			label: "sys.menu.error.500",
+			name: "500",
+			type: MENU,
+			route: "500",
+			component: "/pages/sys/error/Page500",
+		},
+	],
+};
 
-export const DB_ROLE: Role[] = [
-	{ id: "role_admin_id", name: "admin", code: "SUPER_ADMIN" },
-	{ id: "role_test_id", name: "test", code: "TEST" },
-];
+export const PERMISSION_LIST: Permission[] = [DASHBOARD_PERMISSION, MANAGEMENT_PERMISSION, ERRORS_PERMISSION];
 
-export const DB_PERMISSION: Permission[] = [
-	{ id: "permission_create", name: "permission-create", code: "permission:create" },
-	{ id: "permission_read", name: "permission-read", code: "permission:read" },
-	{ id: "permission_update", name: "permission-update", code: "permission:update" },
-	{ id: "permission_delete", name: "permission-delete", code: "permission:delete" },
-];
+/**
+ * Role mock (dj-front style: id, name, label, permission array)
+ */
+const ADMIN_ROLE = {
+	id: "4281707933534332",
+	name: "Admin",
+	label: "admin",
+	order: 1,
+	desc: "Super Admin",
+	permission: PERMISSION_LIST,
+};
+const TEST_ROLE = {
+	id: "9931665660771476",
+	name: "Test",
+	label: "test",
+	order: 2,
+	desc: "test",
+	permission: [DASHBOARD_PERMISSION, ERRORS_PERMISSION],
+};
+export const ROLE_LIST = [ADMIN_ROLE, TEST_ROLE];
 
-export const DB_USER_ROLE = [
-	{ id: "user_admin_role_admin", userId: "user_admin_id", roleId: "role_admin_id" },
-	{ id: "user_test_role_test", userId: "user_test_id", roleId: "role_test_id" },
-];
+/** Permission set for test user only (dashboard + errors, no management). Used by sign-in mock. */
+export const TEST_USER_PERMISSIONS: Permission[] = [DASHBOARD_PERMISSION, ERRORS_PERMISSION];
 
-export const DB_ROLE_PERMISSION = [
-	{ id: faker.string.uuid(), roleId: "role_admin_id", permissionId: "permission_create" },
-	{ id: faker.string.uuid(), roleId: "role_admin_id", permissionId: "permission_read" },
-	{ id: faker.string.uuid(), roleId: "role_admin_id", permissionId: "permission_update" },
-	{ id: faker.string.uuid(), roleId: "role_admin_id", permissionId: "permission_delete" },
-
-	{ id: faker.string.uuid(), roleId: "role_test_id", permissionId: "permission_read" },
-	{ id: faker.string.uuid(), roleId: "role_test_id", permissionId: "permission_update" },
-];
+/**
+ * User mock (dj-front style: user has role and permissions from role)
+ */
+export const DEFAULT_USER = {
+	id: "b34719e1-ce46-457e-9575-99505ecee828",
+	username: "admin",
+	email: "admin@slash.com",
+	avatar: faker.image.avatarGitHub(),
+	password: "demo1234",
+	role: ADMIN_ROLE,
+	permissions: ADMIN_ROLE.permission,
+};
+export const TEST_USER = {
+	id: "efaa20ea-4dc5-47ee-a200-8a899be29494",
+	username: "test",
+	password: "demo1234",
+	email: "test@slash.com",
+	avatar: faker.image.avatarGitHub(),
+	role: TEST_ROLE,
+	permissions: TEST_ROLE.permission,
+};
+export const USER_LIST = [DEFAULT_USER, TEST_USER];

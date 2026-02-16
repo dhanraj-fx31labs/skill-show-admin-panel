@@ -1,4 +1,4 @@
-import { DB_USER } from "@/_mock/assets_backup";
+import { USER_LIST } from "@/_mock/assets_backup";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { useAuthCheck } from "@/components/auth/use-auth";
 import { CodeBlock } from "@/components/code/code-bock";
@@ -87,7 +87,7 @@ export default function PermissionPage() {
 
 	const handleSwitch = (_username: string) => {
 		if (_username === username) return;
-		const user = DB_USER.find((user) => user.username === _username);
+		const user = USER_LIST.find((user) => user.username === _username);
 		if (user) {
 			signIn({ username: user.username, password: user.password });
 		}
@@ -98,7 +98,7 @@ export default function PermissionPage() {
 				<Text variant="subTitle1">当前用户：</Text>
 				<Tabs defaultValue={username} onValueChange={handleSwitch}>
 					<TabsList>
-						{DB_USER.map((user) => (
+						{USER_LIST.map((user) => (
 							<TabsTrigger key={user.username} value={user.username}>
 								{user.username}
 							</TabsTrigger>
@@ -119,7 +119,7 @@ export default function PermissionPage() {
 					<div className="flex items-center gap-2">
 						<Text variant="body1">当前用户权限：</Text>
 						{permissions && permissions.length > 0 ? (
-							<Text variant="body1">[{permissions?.map((permission) => permission.code).join(", ")}]</Text>
+							<Text variant="body1">[{permissions?.map((p) => p.code ?? p.route ?? p.name).join(", ")}]</Text>
 						) : (
 							<Text variant="body1">[]</Text>
 						)}

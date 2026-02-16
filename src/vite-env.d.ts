@@ -7,8 +7,10 @@ interface ImportMetaEnv {
 	readonly VITE_APP_PUBLIC_PATH: string;
 	/** Base URL for API endpoints */
 	readonly VITE_APP_API_BASE_URL: string;
-	/** Routing mode: frontend routing or backend routing */
-	readonly VITE_APP_ROUTER_MODE: "frontend" | "backend";
+	/** Routing mode: module (static routes) or permission (routes from user permissions) */
+	readonly VITE_APP_ROUTER_MODE: "module" | "permission";
+	/** Home/redirect path after login (e.g. /dashboard/workbench) */
+	readonly VITE_APP_HOMEPAGE: string;
 }
 
 interface ImportMeta {

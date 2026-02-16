@@ -1,4 +1,4 @@
-import { useRouter } from "@/routes/hooks";
+import { useRouter } from "@/router/hooks";
 import { Tabs } from "antd";
 import { useEffect, useRef } from "react";
 import styled from "styled-components";

@@ -1,6 +1,6 @@
 // import { USER_LIST } from "@/_mock/assets";
 import { Icon } from "@/components/icon";
-import { usePathname, useRouter } from "@/routes/hooks";
+import { usePathname, useRouter } from "@/router/hooks";
 import { Badge } from "@/ui/badge";
 import { Button } from "@/ui/button";
 import { Card, CardContent, CardHeader } from "@/ui/card";
@@ -46,7 +46,11 @@ export default function UserPage() {
 			dataIndex: "status",
 			align: "center",
 			width: 120,
-			render: (status) => <Badge variant={status === BasicStatus.DISABLE ? "error" : "success"}>{status === BasicStatus.DISABLE ? "Disable" : "Enable"}</Badge>,
+			render: (status) => (
+				<Badge variant={status === BasicStatus.DISABLE ? "error" : "success"}>
+					{status === BasicStatus.DISABLE ? "Disable" : "Enable"}
+				</Badge>
+			),
 		},
 		{
 			title: "Action",
@@ -84,7 +88,14 @@ export default function UserPage() {
 				</div>
 			</CardHeader>
 			<CardContent>
-				<Table rowKey="id" size="small" scroll={{ x: "max-content" }} pagination={false} columns={columns} dataSource={USERS} />
+				<Table
+					rowKey="id"
+					size="small"
+					scroll={{ x: "max-content" }}
+					pagination={false}
+					columns={columns}
+					dataSource={USERS}
+				/>
 			</CardContent>
 		</Card>
 	);

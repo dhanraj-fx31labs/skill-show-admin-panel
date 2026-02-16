@@ -31,7 +31,9 @@ export const useAuthCheck = (baseOn: "role" | "permission" = "permission") => {
 		if (!accessToken) {
 			return false;
 		}
-		return resourcePool.some((p) => p.code === item);
+		return resourcePool.some(
+			(p) => p.code === item || (baseOn === "permission" && (p as { route?: string }).route === item),
+		);
 	};
 
 	// check if any item exists

@@ -14,8 +14,8 @@ export type GlobalConfig = {
 	publicPath: string;
 	/** Base URL for API endpoints */
 	apiBaseUrl: string;
-	/** Routing mode: frontend routing or backend routing */
-	routerMode: "frontend" | "backend";
+	/** Routing mode: module (static routes from files) or permission (routes from user permission tree) */
+	routerMode: "module" | "permission";
 };
 
 /**
@@ -28,8 +28,8 @@ export type GlobalConfig = {
 export const GLOBAL_CONFIG: GlobalConfig = {
 	appName: "Slash Admin",
 	appVersion: packageJson.version,
-	defaultRoute: import.meta.env.VITE_APP_DEFAULT_ROUTE || "/workbench",
+	defaultRoute: import.meta.env.VITE_APP_DEFAULT_ROUTE || "/dashboard/workbench",
 	publicPath: import.meta.env.VITE_APP_PUBLIC_PATH || "/",
 	apiBaseUrl: import.meta.env.VITE_APP_API_BASE_URL || "/api",
-	routerMode: import.meta.env.VITE_APP_ROUTER_MODE || "frontend",
+	routerMode: import.meta.env.VITE_APP_ROUTER_MODE || "module",
 };

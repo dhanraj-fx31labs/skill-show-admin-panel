@@ -7,13 +7,11 @@ const menuList = http.get("/api/menu", async () => {
 	const menuTree = convertFlatToTree(DB_MENU);
 	return HttpResponse.json(
 		{
+			status: ResultStatus.SUCCESS,
 			message: "",
 			data: menuTree,
-			status: ResultStatus.SUCCESS, // business status
 		},
-		{
-			status: 200, // http status
-		},
+		{ status: 200 },
 	);
 });
 

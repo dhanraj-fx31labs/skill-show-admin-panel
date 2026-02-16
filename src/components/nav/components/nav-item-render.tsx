@@ -1,4 +1,5 @@
-import { RouterLink } from "@/routes/components/router-link";
+import { useRef } from "react";
+import { RouterLink } from "@/router/components/router-link";
 import type { NavItemProps } from "../types";
 
 type NavItemRendererProps = {
@@ -13,17 +14,28 @@ type NavItemRendererProps = {
  */
 export const NavItemRenderer: React.FC<NavItemRendererProps> = ({ item, className, children }) => {
 	const { disabled, hasChild, path, onClick } = item;
+	const buttonRef = useRef<HTMLButtonElement>(null);
 
 	if (disabled) {
 		return <div className={className}>{children}</div>;
 	}
 
 	if (hasChild) {
-		// Vertical nav items with children are clickable containers
 		return (
-			<div className={className} onClick={onClick}>
+			<button
+				ref={buttonRef}
+				type="button"
+				className={className}
+				onClick={onClick as unknown as React.MouseEventHandler<HTMLButtonElement>}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						buttonRef.current?.click();
+					}
+				}}
+			>
 				{children}
-			</div>
+			</button>
 		);
 	}
 

@@ -1,6 +1,6 @@
 import { useLayoutEffect } from "react";
 
-import { useRouter } from "@/routes/hooks";
+import { useRouter } from "@/router/hooks";
 
 type Props = {
 	src: string;

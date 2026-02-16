@@ -1,4 +1,5 @@
 import Logo from "@/assets/icons/ic-logo-badge.svg";
+import Router from "@/router/index";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { QueryClient } from "@tanstack/react-query";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
@@ -21,7 +22,7 @@ if (import.meta.env.DEV) {
 	});
 }
 
-function App({ children }: { children: React.ReactNode }) {
+function App() {
 	return (
 		<HelmetProvider>
 			<QueryClientProvider client={new QueryClient()}>
@@ -33,7 +34,9 @@ function App({ children }: { children: React.ReactNode }) {
 					</Helmet>
 					<Toast />
 					<RouteLoadingProgress />
-					<MotionLazy>{children}</MotionLazy>
+					<MotionLazy>
+						<Router />
+					</MotionLazy>
 				</ThemeProvider>
 			</QueryClientProvider>
 		</HelmetProvider>

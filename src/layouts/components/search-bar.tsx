@@ -1,6 +1,6 @@
 import { Icon } from "@/components/icon";
 import useLocale from "@/locales/use-locale";
-import { useRouter } from "@/routes/hooks";
+import { useRouter } from "@/router/hooks";
 import { Badge } from "@/ui/badge";
 import { Button } from "@/ui/button";
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandSeparator } from "@/ui/command";
@@ -26,7 +26,7 @@ const HighlightText = ({ text, query }: { text: string; query: string }) => {
 		<>
 			{parts.map((part, i) =>
 				part.toLowerCase() === query.toLowerCase() ? (
-					// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+					// biome-ignore lint/suspicious/noArrayIndexKey: index is stable for highlight segments
 					<span key={i} className="text-primary">
 						{part}
 					</span>
