@@ -1,48 +1,89 @@
 import { isEmpty } from "ramda";
 import { useEffect, useState } from "react";
-import { useMatches, useOutlet } from "react-router";
+import { type Params, useMatches, useOutlet } from "react-router";
 
-import { replaceDynamicParams } from "../utils";
 import { useFlattenedRoutes } from "./use-flattened-routes";
 import { useRouter } from "./use-router";
 
 import type { RouteMeta } from "#/router";
 
-const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
+const { VITE_APP_HOMEPAGE } = import.meta.env;
+
 /**
- * 返回当前路由Meta信息
+ * Returns the meta information of the currently active route.
  */
-export function useCurrentRouteMeta() {
-	const { push } = useRouter();
+export function useCurrentRouteMeta(): RouteMeta | undefined {
+  const { push } = useRouter();
 
-	const children = useOutlet();
+  // Current rendered outlet (child route component)
+  const outlet = useOutlet();
 
-	const matchs = useMatches();
+  // All matched routes from react-router
+  const matches = useMatches();
 
-	const flattenedRoutes = useFlattenedRoutes();
+  // Flattened route configuration (custom hook)
+  const flattenedRoutes = useFlattenedRoutes();
 
-	const [currentRouteMeta, setCurrentRouteMeta] = useState<RouteMeta>();
+  const [currentRouteMeta, setCurrentRouteMeta] = useState<RouteMeta>();
 
-	useEffect(() => {
-		const lastRoute = matchs.at(-1);
-		if (!lastRoute) return;
+  useEffect(() => {
+    // Get the last matched route (deepest active route)
+    const lastRoute = matches.at(-1);
+    if (!lastRoute) return;
 
-		const { pathname, params } = lastRoute;
-		const matchedRouteMeta = flattenedRoutes.find((item) => {
-			const replacedKey = replaceDynamicParams(item.key, params);
-			return replacedKey === pathname || `${replacedKey}/` === pathname;
-		});
+    const { pathname, params } = lastRoute;
 
-		if (matchedRouteMeta) {
-			matchedRouteMeta.outlet = children;
-			if (!isEmpty(params)) {
-				matchedRouteMeta.params = params;
-			}
-			setCurrentRouteMeta({ ...matchedRouteMeta });
-		} else {
-			push(HOMEPAGE);
-		}
-	}, [matchs, flattenedRoutes, children, push]);
+    // Find the corresponding route meta from flattened routes
+    const matchedRouteMeta = flattenedRoutes.find((route) => {
+      const replacedKey = replaceDynamicParams(route.key, params);
+      return replacedKey === pathname || `${replacedKey}/` === pathname;
+    });
 
-	return currentRouteMeta;
+    if (matchedRouteMeta) {
+      // Create a new object to avoid mutating original route config
+      const updatedMeta: RouteMeta = {
+        ...matchedRouteMeta,
+        outlet,
+        ...(params && !isEmpty(params) ? { params } : {}),
+      };
+
+      setCurrentRouteMeta(updatedMeta);
+    } else {
+      // Redirect to homepage if route not found
+      if (VITE_APP_HOMEPAGE) {
+        push(VITE_APP_HOMEPAGE);
+      }
+    }
+  }, [matches, flattenedRoutes, outlet, push]);
+
+  return currentRouteMeta;
+}
+
+/**
+ * Replace dynamic route parameters.
+ *
+ * Example:
+ *  Input:  "/user/:id"
+ *  Params: { id: "123" }
+ *  Output: "/user/123"
+ */
+export function replaceDynamicParams(
+  routeKey: string,
+  params: Params<string>
+): string {
+  let replacedPathName = routeKey;
+
+  const paramNames = routeKey.match(/:\w+/g);
+  if (!paramNames) return replacedPathName;
+
+  for (const paramName of paramNames) {
+    const paramKey = paramName.slice(1);
+    const paramValue = params[paramKey];
+
+    if (!paramValue) continue;
+
+    replacedPathName = replacedPathName.replace(paramName, paramValue);
+  }
+
+  return replacedPathName;
 }

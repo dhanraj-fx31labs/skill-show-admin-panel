@@ -10,6 +10,11 @@ import { Suspense } from "react";
 import { Outlet, ScrollRestoration, useLocation } from "react-router";
 import { backendNavData } from "./nav/nav-data/nav-data-backend";
 import { frontendNavData } from "./nav/nav-data/nav-data-frontend";
+import { MULTI_TABS_HEIGHT } from "./config";
+import { themeVars } from "@/theme/theme.css";
+import { CSSProperties } from "styled-components";
+import { MultiTabsProvider } from "./multi-tabs/providers/multi-tabs-provider";
+import MultiTabs from "./multi-tabs";
 
 /**
  * find auth by path
@@ -28,8 +33,13 @@ const allItems = navData.reduce((acc: any[], group) => {
 }, []);
 
 const Main = () => {
-	const { themeStretch } = useSettings();
-
+	const { themeStretch ,multiTab} = useSettings();
+  const mainStyle: CSSProperties = {
+		paddingTop: multiTab ? MULTI_TABS_HEIGHT : 0,
+		background: themeVars.colors.background.default,
+		transition: "all 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+		width: "100%",
+	};
 	const { pathname } = useLocation();
 	const currentNavAuth = findAuthByPath(pathname);
 
@@ -51,7 +61,13 @@ const Main = () => {
 				}}
 			>
 				<Suspense fallback={<LineLoading />}>
-					<Outlet />
+					{multiTab ? (
+						<MultiTabsProvider>
+							<MultiTabs />
+						</MultiTabsProvider>
+					) : (
+						<Outlet />
+					)}
 					<ScrollRestoration />
 				</Suspense>
 			</main>

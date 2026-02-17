@@ -1,16 +1,11 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-	/** Default route path for the application */
-	readonly VITE_APP_DEFAULT_ROUTE: string;
-	/** Public path for static assets */
-	readonly VITE_APP_PUBLIC_PATH: string;
-	/** Base URL for API endpoints */
-	readonly VITE_APP_API_BASE_URL: string;
-	/** Routing mode: module (static routes) or permission (routes from user permissions) */
-	readonly VITE_APP_ROUTER_MODE: "module" | "permission";
-	/** Home/redirect path after login (e.g. /dashboard/workbench) */
+	readonly VITE_APP_ROUTER_MODE: "permission" | "module";
+	readonly VITE_APP_BASE_API: string;
 	readonly VITE_APP_HOMEPAGE: string;
+	readonly VITE_APP_BASE_PATH: string;
+	readonly VITE_APP_ENV: "development" | "production";
 }
 
 interface ImportMeta {

@@ -23,7 +23,7 @@ import { type ThemeColorPresets, ThemeLayout, ThemeMode } from "#/enum";
 export default function SettingButton() {
 	const { t } = useTranslation();
 	const settings = useSettings();
-	const { themeMode, themeColorPresets, themeLayout, themeStretch, breadCrumb, fontSize, fontFamily } = settings;
+	const { themeMode, themeColorPresets, themeLayout, themeStretch, breadCrumb, fontSize, fontFamily,multiTab } = settings;
 	const { setSettings } = useSettingActions();
 
 	const updateSettings = (partialSettings: Partial<SettingsType>) => {
@@ -326,10 +326,10 @@ export default function SettingButton() {
 							<div className="flex items-center justify-between">
 								<Text variant="subTitle2">{t("sys.settings.breadcrumb")}</Text>
 								<Switch checked={breadCrumb} onCheckedChange={(checked) => updateSettings({ breadCrumb: checked })} />
-								{/* <div className="flex items-center justify-between text-sm text-text-disabled">
+								<div className="flex items-center justify-between text-sm text-text-disabled">
 									<div>{t("sys.settings.multiTab")}</div>
 									<Switch checked={multiTab} onCheckedChange={(checked) => updateSettings({ multiTab: checked })} />
-								</div> */}
+								</div>
 								{/* <div className="flex items-center justify-between text-sm text-text-disabled">
 									<div>{t("sys.settings.darkSidebar")}</div>
 									<Switch checked={darkSidebar} onCheckedChange={(checked) => updateSettings({ darkSidebar: checked })} />

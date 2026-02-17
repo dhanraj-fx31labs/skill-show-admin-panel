@@ -40,7 +40,7 @@ export function useRouteToMenuFn() {
 								)}
 							>
 								<div className="">{t(meta.label)}</div>
-								{meta.info}
+								{meta.suffix}
 							</div>
 						),
 						...(meta.icon && { icon: renderIcon(meta.icon) }),

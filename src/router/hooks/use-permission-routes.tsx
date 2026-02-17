@@ -2,167 +2,225 @@ import { Icon } from "@/components/icon";
 import { LineLoading } from "@/components/loading";
 import { useUserPermission } from "@/store/userStore";
 import { flattenTrees } from "@/utils/tree";
-import { isEmpty } from "ramda";
-import { Suspense, lazy, useMemo } from "react";
+import { Tag } from "antd";
+import { Suspense, lazy, useMemo, type ReactNode, type ComponentType } from "react";
 import { Navigate, Outlet } from "react-router";
 import type { Permission } from "#/entity";
 import { BasicStatus, PermissionType } from "#/enum";
 import type { AppRouteObject } from "#/router";
 import { getRoutesFromModules } from "../utils";
 
+/**
+ * Base path for dynamic page imports
+ */
 const ENTRY_PATH = "/src/pages";
-const PAGES = import.meta.glob("/src/pages/**/*.tsx");
 
-function normalizePath(componentPath: string): string {
-	return componentPath.startsWith("/pages")
-		? `/src${componentPath}`
-		: `${ENTRY_PATH}${componentPath.startsWith("/") ? componentPath : `/${componentPath}`}`;
-}
+/**
+ * Strictly typed Vite dynamic imports
+ */
+const PAGES = import.meta.glob<{ default: ComponentType<any> }>(
+  "/src/pages/**/*.tsx"
+);
 
-/** Resolve lazy loader: try path.tsx then path/index.tsx; Vite glob keys may vary (/, no slash, ./) */
-function loadComponentFromPath(componentPath: string) {
-	const base = normalizePath(componentPath);
-	const withoutExt = base.endsWith(".tsx") ? base.slice(0, -4) : base;
-	const candidates = [`${withoutExt}.tsx`, `${withoutExt}/index.tsx`];
-	const keys = new Set<string>();
-	for (const c of candidates) {
-		keys.add(c);
-		keys.add(c.replace(/^\//, ""));
-		keys.add(c.startsWith("/") ? `.${c}` : `./${c}`);
-	}
-	for (const key of keys) {
-		const loader = PAGES[key];
-		if (loader) return loader;
-	}
-	return undefined;
+/**
+ * Safely load component from dynamic path
+ */
+function loadComponentFromPath(path: string) {
+  return PAGES[`${ENTRY_PATH}${path}`];
 }
 
 /**
- * Build complete route path by traversing from current permission to root
+ * Recursively build full route path from current permission up to root.
+ *
+ * Example:
+ *  parent -> child -> subchild
+ *  returns: /parent/child/subchild
  */
 function buildCompleteRoute(
-	permission: Permission,
-	flattenedPermissions: Permission[],
-	segments: string[] = [],
+  permission: Permission,
+  flattenedPermissions: Permission[],
+  segments: string[] = []
 ): string {
-	const segment = permission.route ?? "";
-	if (segment) segments.unshift(segment);
+  segments.unshift(permission.route as string);
 
-	if (!permission.parentId) {
-		return `/${segments.join("/")}`;
-	}
+  if (!permission.parentId) {
+    return `/${segments.join("/")}`;
+  }
 
-	const parent = flattenedPermissions.find((p) => p.id === permission.parentId);
-	if (!parent) {
-		return `/${segments.join("/")}`;
-	}
+  const parent = flattenedPermissions.find(
+    (p) => p.id === permission.parentId
+  );
 
-	return buildCompleteRoute(parent, flattenedPermissions, segments);
+  if (!parent) {
+    console.warn(
+      `Parent permission not found for ID: ${permission.parentId}`
+    );
+    return `/${segments.join("/")}`;
+  }
+
+  return buildCompleteRoute(parent, flattenedPermissions, segments);
 }
 
-const createBaseRoute = (permission: Permission, completeRoute: string): AppRouteObject => {
-	const { route, label, icon, order, hide, hideTab, status, frameSrc, newFeature } = permission;
+/**
+ * Tag component shown when feature is marked as new.
+ */
+function NewFeatureTag(): ReactNode {
+  return (
+    <Tag color="cyan" className="ml-2!">
+      <div className="flex items-center gap-1">
+        <Icon icon="solar:bell-bing-bold-duotone" size={12} />
+        <span className="ms-1">NEW</span>
+      </div>
+    </Tag>
+  );
+}
 
-	const baseRoute: AppRouteObject = {
-		path: route ?? "",
-		meta: {
-			label: label ?? permission.name,
-			key: completeRoute,
-			hideMenu: !!hide,
-			hideTab,
-			disabled: status === BasicStatus.DISABLE,
-		},
-	};
+/**
+ * Create base route structure shared by catalogue and menu routes.
+ */
+function createBaseRoute(
+  permission: Permission,
+  completeRoute: string
+): AppRouteObject {
+  const {
+    route,
+    label,
+    icon,
+    order,
+    hide,
+    hideTab,
+    status,
+    frameSrc,
+    newFeature,
+  } = permission;
 
-	if (order !== undefined) baseRoute.order = order;
-	if (baseRoute.meta) {
-		if (icon) baseRoute.meta.icon = <Icon icon={icon} className="ant-menu-item-icon" size={24} />;
-		if (frameSrc) baseRoute.meta.frameSrc = frameSrc;
-		if (newFeature) baseRoute.meta.suffix = <span className="ml-2 text-cyan-600 text-xs">NEW</span>;
-	}
+  const baseRoute: AppRouteObject = {
+    path: route,
+    meta: {
+      label:label as string,
+      key: completeRoute,
+      hideMenu: Boolean(hide),
+      hideTab,
+      disabled: status === BasicStatus.DISABLE,
+    },
+  };
 
-	return baseRoute;
-};
+  if (order) baseRoute.order = order;
 
-const createCatalogueRoute = (permission: Permission, flattenedPermissions: Permission[]): AppRouteObject => {
-	const baseRoute = createBaseRoute(permission, buildCompleteRoute(permission, flattenedPermissions));
+  if (icon) baseRoute.meta!.icon = icon;
+  if (frameSrc) baseRoute.meta!.frameSrc = frameSrc;
+  if (newFeature) baseRoute.meta!.suffix = <NewFeatureTag />;
 
-	if (baseRoute.meta) {
-		baseRoute.meta.hideTab = true;
-	}
+  return baseRoute;
+}
 
-	const children = permission.children ?? [];
-	if (!permission.parentId) {
-		baseRoute.element = (
-			<Suspense fallback={<LineLoading />}>
-				<Outlet />
-			</Suspense>
-		);
-	}
+/**
+ * Create route for catalogue-type permission (folder-like route).
+ */
+function createCatalogueRoute(
+  permission: Permission,
+  flattenedPermissions: Permission[]
+): AppRouteObject {
+  const baseRoute = createBaseRoute(
+    permission,
+    buildCompleteRoute(permission, flattenedPermissions)
+  );
 
-	baseRoute.children = transformPermissionsToRoutes(children, flattenedPermissions);
+  baseRoute.meta!.hideTab = true;
 
-	if (!isEmpty(children)) {
-		const firstChildRoute = children[0].route ?? "";
-		baseRoute.children?.unshift({
-			index: true,
-			element: <Navigate to={firstChildRoute} replace />,
-		});
-	}
+  const { parentId, children = [] } = permission;
 
-	return baseRoute;
-};
+  if (!parentId) {
+    baseRoute.element = (
+      <Suspense fallback={<LineLoading />}>
+        <Outlet />
+      </Suspense>
+    );
+  }
 
-const createMenuRoute = (permission: Permission, flattenedPermissions: Permission[]): AppRouteObject => {
-	const baseRoute = createBaseRoute(permission, buildCompleteRoute(permission, flattenedPermissions));
+  baseRoute.children = transformPermissionsToRoutes(
+    children,
+    flattenedPermissions
+  );
 
-	if (permission.component) {
-		const loader = loadComponentFromPath(permission.component) as
-			| (() => Promise<{ default: React.ComponentType }>)
-			| undefined;
-		if (loader) {
-			const Element = lazy(loader);
-			if (permission.frameSrc) {
-				baseRoute.element = <Element />;
-			} else {
-				baseRoute.element = (
-					<Suspense fallback={<LineLoading />}>
-						<Element />
-					</Suspense>
-				);
-			}
-		}
-	}
+  if (children.length > 0) {
+    baseRoute.children.unshift({
+      index: true,
+      element: <Navigate to={children[0].route as string} replace />,
+    });
+  }
 
-	return baseRoute;
-};
+  return baseRoute;
+}
 
-function transformPermissionsToRoutes(permissions: Permission[], flattenedPermissions: Permission[]): AppRouteObject[] {
-	return permissions.map((permission) => {
-		if (permission.type === PermissionType.CATALOGUE) {
-			return createCatalogueRoute(permission, flattenedPermissions);
-		}
-		return createMenuRoute(permission, flattenedPermissions);
-	});
+/**
+ * Create route for menu-type permission (leaf route).
+ */
+function createMenuRoute(
+  permission: Permission,
+  flattenedPermissions: Permission[]
+): AppRouteObject {
+  const baseRoute = createBaseRoute(
+    permission,
+    buildCompleteRoute(permission, flattenedPermissions)
+  );
+
+  if (permission.component) {
+    const loader = loadComponentFromPath(permission.component);
+
+    if (loader) {
+      const Element = lazy(loader);
+
+      baseRoute.element = permission.frameSrc ? (
+        <Element src={permission.frameSrc} />
+      ) : (
+        <Suspense fallback={<LineLoading />}>
+          <Element />
+        </Suspense>
+      );
+    } else {
+      console.error(
+        `Component not found for path: ${permission.component}`
+      );
+    }
+  }
+
+  return baseRoute;
+}
+
+/**
+ * Transform permission tree into React Router route objects.
+ */
+function transformPermissionsToRoutes(
+  permissions: Permission[],
+  flattenedPermissions: Permission[]
+): AppRouteObject[] {
+  return permissions.map((permission) =>
+    permission.type === PermissionType.CATALOGUE
+      ? createCatalogueRoute(permission, flattenedPermissions)
+      : createMenuRoute(permission, flattenedPermissions)
+  );
 }
 
 const ROUTE_MODE = import.meta.env.VITE_APP_ROUTER_MODE;
 
 /**
- * Returns route config for the protected layout.
- * - "module": static routes from src/router/routes/modules
- * - "permission": routes built from user permission tree
+ * Hook that returns application routes based on permission mode.
  */
 export function usePermissionRoutes(): AppRouteObject[] {
-	const permissions = useUserPermission();
+  if (ROUTE_MODE === "module") {
+    return getRoutesFromModules();
+  }
 
-	return useMemo(() => {
-		if (ROUTE_MODE === "module") {
-			return getRoutesFromModules();
-		}
-		if (!permissions?.length) return [];
+  const permissions = useUserPermission();
 
-		const flattenedPermissions = flattenTrees(permissions);
-		return transformPermissionsToRoutes(permissions, flattenedPermissions);
-	}, [permissions]);
+  return useMemo(() => {
+    if (!permissions?.length) return [];
+
+    const flattenedPermissions = flattenTrees(permissions);
+    return transformPermissionsToRoutes(
+      permissions,
+      flattenedPermissions
+    );
+  }, [permissions]);
 }
