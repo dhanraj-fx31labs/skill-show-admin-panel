@@ -1,12 +1,12 @@
-import { Progress } from "@/ui/progress";
 import { useEffect, useState } from "react";
+import { Progress } from "@/ui/progress";
 
 export function RouteLoadingProgress() {
 	const [progress, setProgress] = useState(0);
 
 	useEffect(() => {
 		let lastHref = window.location.href;
-		let timer: NodeJS.Timeout;
+		let timer: ReturnType<typeof setTimeout>;
 
 		const handleRouteChange = () => {
 			setProgress(0);

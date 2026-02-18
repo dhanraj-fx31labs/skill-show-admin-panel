@@ -92,6 +92,7 @@
 				"index": "Error Page"
 			},
 			"external_link": "External Link",
+			"frame": "Frame",
 			"link": "Item External",
 			"functions": "Functions",
 			"i18n": "Multi Language",

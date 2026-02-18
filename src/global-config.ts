@@ -16,6 +16,7 @@ export type GlobalConfig = {
 	apiBaseUrl: string;
 	/** Routing mode: module (static routes from files) or permission (routes from user permission tree) */
 	routerMode: "module" | "permission";
+	backendUrl: string;
 };
 
 /**
@@ -26,10 +27,11 @@ export type GlobalConfig = {
  * Please don't use the import.meta.env to get the configuration, use the GLOBAL_CONFIG instead
  */
 export const GLOBAL_CONFIG: GlobalConfig = {
-	appName: "Slash Admin",
+	appName: "Skill Show",
 	appVersion: packageJson.version,
 	defaultRoute: import.meta.env.VITE_APP_DEFAULT_ROUTE || "/dashboard/workbench",
 	publicPath: import.meta.env.VITE_APP_PUBLIC_PATH || "/",
 	apiBaseUrl: import.meta.env.VITE_APP_API_BASE_URL || "/api",
 	routerMode: import.meta.env.VITE_APP_ROUTER_MODE || "module",
+	backendUrl: import.meta.env.VITE_BACKEND_URL || "http://localhost:3000",
 };

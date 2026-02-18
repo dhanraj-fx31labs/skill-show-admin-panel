@@ -18,6 +18,8 @@ import { NavLink } from "react-router";
 export default function AccountDropdown() {
 	const { replace } = useRouter();
 	const { username, email, avatar } = useUserInfo();
+	const avatarSrc =
+		avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(username || email || "U")}&background=random`;
 	const { clearUserInfoAndToken } = useUserActions();
 	const { backToLogin } = useLoginStateContext();
 	const { t } = useTranslation();
@@ -28,7 +30,7 @@ export default function AccountDropdown() {
 		} catch (error) {
 			console.log(error);
 		} finally {
-			replace("/auth/login");
+			replace("/login");
 		}
 	};
 
@@ -36,14 +38,14 @@ export default function AccountDropdown() {
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
 				<Button variant="ghost" size="icon" className="rounded-full">
-					<img className="h-6 w-6 rounded-full" src={avatar} alt="" />
+					<img className="h-6 w-6 rounded-full" src={avatarSrc} alt="" />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="w-56">
 				<div className="flex items-center gap-2 p-2">
-					<img className="h-10 w-10 rounded-full" src={avatar} alt="" />
+					<img className="h-10 w-10 rounded-full" src={avatarSrc} alt="" />
 					<div className="flex flex-col items-start">
-						<div className="text-text-primary text-sm font-medium">{username}</div>
+						<div className="text-text-primary text-sm font-medium">{username || email}</div>
 						<div className="text-text-secondary text-xs">{email}</div>
 					</div>
 				</div>

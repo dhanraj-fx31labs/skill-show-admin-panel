@@ -1,15 +1,16 @@
+import type { Variants } from "motion/react";
+import { m } from "motion/react";
+import { useMemo } from "react";
 import Cover3 from "@/assets/images/cover/cover_3.jpg";
 import MotionContainer from "@/components/animate/motion-container";
 import { getVariant } from "@/components/animate/variants";
 import { themeVars } from "@/theme/theme.css";
-import { m } from "motion/react";
-import { useMemo } from "react";
 
 type Props = {
 	variant: string;
 };
 export default function ContainerView({ variant }: Props) {
-	const varients = useMemo(() => getVariant(variant), [variant]);
+	const varients = useMemo(() => getVariant(variant) as Variants, [variant]);
 	const isKenburns = variant.includes("kenburns");
 
 	return (

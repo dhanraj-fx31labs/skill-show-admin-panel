@@ -1,12 +1,67 @@
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import type { MenuTree, Permission, Role, UserInfo, UserToken } from "#/entity";
+import { BasicStatus, type PermissionType, StorageEnum } from "#/enum";
+import authService, { type AuthLoginReq, type AuthUserProfile } from "@/api/services/authService";
 
-import userService, { type SignInReq } from "@/api/services/userService";
-
-import { toast } from "sonner";
-import type { UserInfo, UserToken } from "#/entity";
-import { StorageEnum } from "#/enum";
+function mapAuthProfileToUserInfo(profile: AuthUserProfile): UserInfo {
+	const roles: Role[] = (profile.roles || []).map((r) => ({
+		id: r.id,
+		name: r.name,
+		code: r.name,
+	}));
+	const mapNodeToPermission = (n: AuthUserProfile["permissionTree"][0]): Permission => ({
+		id: n.id,
+		parentId: n.parentId ?? undefined,
+		name: n.name,
+		label: n.label,
+		route: n.route,
+		type: n.type as PermissionType,
+		order: n.order ?? undefined,
+		icon: n.icon ?? undefined,
+		component: n.component ?? undefined,
+		hide: n.hide ?? undefined,
+		code: n.name,
+		read: n.read,
+		create: n.create,
+		can_update: n.update,
+		delete: n.delete,
+		is_user_specific: n.isUserSpecific,
+		children: n.children?.map(mapNodeToPermission),
+	});
+	const permissions: Permission[] = (profile.permissionTree || []).map(mapNodeToPermission);
+	const mapNodeToMenuTree = (n: AuthUserProfile["permissionTree"][0]): MenuTree => ({
+		id: n.id,
+		parentId: n.parentId ?? "",
+		name: n.name,
+		code: n.name,
+		path: n.route,
+		type: n.type as PermissionType,
+		order: n.order ?? undefined,
+		icon: n.icon ?? undefined,
+		component: n.component ?? undefined,
+		hidden: n.hide ?? undefined,
+		children: n.children?.map(mapNodeToMenuTree),
+	});
+	const menu: MenuTree[] = (profile.permissionTree || []).map(mapNodeToMenuTree);
+	const username =
+		profile.displayName ||
+		(profile.firstName || profile.lastName
+			? [profile.firstName, profile.lastName].filter(Boolean).join(" ")
+			: undefined) ||
+		profile.email;
+	return {
+		id: profile.id,
+		email: profile.email,
+		username,
+		roles,
+		status: profile.isActive ? BasicStatus.ENABLE : BasicStatus.DISABLE,
+		permissions,
+		menu,
+	};
+}
 
 type UserStore = {
 	userInfo: Partial<UserInfo>;
@@ -59,17 +114,18 @@ export const useSignIn = () => {
 	const { setUserToken, setUserInfo } = useUserActions();
 
 	const signInMutation = useMutation({
-		mutationFn: userService.signin,
+		mutationFn: authService.login,
 	});
 
-	const signIn = async (data: SignInReq) => {
+	const signIn = async (data: AuthLoginReq) => {
 		try {
 			const res = await signInMutation.mutateAsync(data);
 			const { user, accessToken, refreshToken } = res;
 			setUserToken({ accessToken, refreshToken });
-			setUserInfo(user);
-		} catch (err) {
-			toast.error(err.message, {
+			setUserInfo(mapAuthProfileToUserInfo(user));
+		} catch (err: unknown) {
+			const message = err instanceof Error ? err.message : "Login failed";
+			toast.error(message, {
 				position: "top-center",
 			});
 			throw err;

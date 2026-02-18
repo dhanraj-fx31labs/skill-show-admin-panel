@@ -1,9 +1,10 @@
 import { setupWorker } from "msw/browser";
-import { mockTokenExpired } from "./handlers/_demo";
-import { menuList } from "./handlers/_menu";
-import { signIn, userList } from "./handlers/_user";
+import authMockApi from "./handlers/_auth";
+import demoMockApi from "./handlers/_demo";
+import orgMockApi from "./handlers/_org";
+import userMockApi from "./handlers/_user";
 
-const handlers = [signIn, userList, mockTokenExpired, menuList];
+const handlers = [...authMockApi, ...userMockApi, ...orgMockApi, ...demoMockApi];
 const worker = setupWorker(...handlers);
 
-export { worker };
+export default worker;

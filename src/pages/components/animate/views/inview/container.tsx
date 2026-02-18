@@ -1,10 +1,11 @@
+import type { Variants } from "motion/react";
+import { m } from "motion/react";
+import { repeat } from "ramda";
+import { useMemo } from "react";
 import Cover3 from "@/assets/images/cover/cover_3.jpg";
 import MotionContainer from "@/components/animate/motion-container";
 import { getVariant } from "@/components/animate/variants";
 import { themeVars } from "@/theme/theme.css";
-import { m } from "motion/react";
-import { repeat } from "ramda";
-import { useMemo } from "react";
 
 const TEXT = "SlashAdmin";
 type Props = {
@@ -13,7 +14,7 @@ type Props = {
 	variant: string;
 };
 export default function ContainerView({ isText, variant, isMulti }: Props) {
-	const varients = useMemo(() => getVariant(variant), [variant]);
+	const varients = useMemo(() => getVariant(variant) as Variants, [variant]);
 	const imgs = useMemo(() => (isMulti ? repeat(Cover3, 5) : [Cover3]), [isMulti]);
 
 	return (

@@ -1,15 +1,15 @@
+import { ErrorBoundary } from "react-error-boundary";
+import { createHashRouter, Navigate, type RouteObject } from "react-router";
+import { RouterProvider } from "react-router/dom";
+import type { AppRouteObject } from "#/router";
 import DashboardLayout from "@/layouts/dashboard";
 import Page500 from "@/pages/sys/error/Page500";
 import Login from "@/pages/sys/login";
 import ProtectedRoute from "@/router/components/protected-route";
 import { usePermissionRoutes } from "@/router/hooks";
 import { ERROR_ROUTE } from "@/router/routes/error-routes";
-import { ErrorBoundary } from "react-error-boundary";
-import { Navigate, type RouteObject, createHashRouter } from "react-router";
-import { RouterProvider } from "react-router/dom";
-import type { AppRouteObject } from "#/router";
 
-const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
+const HOMEPAGE = import.meta.env.VITE_APP_HOMEPAGE ?? "/dashboard/workbench";
 
 const PUBLIC_ROUTE: AppRouteObject[] = [
 	{

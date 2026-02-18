@@ -136,6 +136,7 @@
 			"label": "项目标签",
 			"link": "链接",
 			"external_link": "外链",
+			"frame": "框架",
 			"iframe": "内嵌",
 			"blank": "空白",
 			"calendar": "日历",

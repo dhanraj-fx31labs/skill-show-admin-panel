@@ -3,7 +3,7 @@ import "./theme/theme.css";
 import "./locales/i18n";
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { worker } from "./_mock";
+import worker from "./_mock";
 import menuService from "./api/services/menuService";
 import { registerLocalIcons } from "./components/icon";
 import { GLOBAL_CONFIG } from "./global-config";

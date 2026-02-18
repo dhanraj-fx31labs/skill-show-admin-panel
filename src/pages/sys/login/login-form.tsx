@@ -1,5 +1,4 @@
-import { USER_LIST } from "@/_mock/assets_backup";
-import type { SignInReq } from "@/api/services/userService";
+import type { AuthLoginReq } from "@/api/services/authService";
 import { Icon } from "@/components/icon";
 import { GLOBAL_CONFIG } from "@/global-config";
 import { useSignIn } from "@/store/userStore";
@@ -25,16 +24,16 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 	const { loginState, setLoginState } = useLoginStateContext();
 	const signIn = useSignIn();
 
-	const form = useForm<SignInReq>({
+	const form = useForm<AuthLoginReq>({
 		defaultValues: {
-			username: USER_LIST[0].username,
-			password: USER_LIST[0].password,
+			email: "",
+			password: "",
 		},
 	});
 
 	if (loginState !== LoginStateEnum.LOGIN) return null;
 
-	const handleFinish = async (values: SignInReq) => {
+	const handleFinish = async (values: AuthLoginReq) => {
 		setLoading(true);
 		try {
 			await signIn(values);
@@ -58,13 +57,19 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
 					<FormField
 						control={form.control}
-						name="username"
-						rules={{ required: t("sys.login.accountPlaceholder") }}
+						name="email"
+						rules={{
+							required: t("sys.login.accountPlaceholder"),
+							pattern: {
+								value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+								message: t("sys.login.emailInvalid") || "Invalid email",
+							},
+						}}
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>{t("sys.login.userName")}</FormLabel>
+								<FormLabel>{t("sys.login.email")}</FormLabel>
 								<FormControl>
-									<Input placeholder={USER_LIST.map((user) => user.username).join("/")} {...field} />
+									<Input type="email" placeholder={t("sys.login.email")} {...field} />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -79,7 +84,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 							<FormItem>
 								<FormLabel>{t("sys.login.password")}</FormLabel>
 								<FormControl>
-									<Input type="password" placeholder={USER_LIST[0].password} {...field} suppressHydrationWarning />
+									<Input
+										type="password"
+										placeholder={t("sys.login.passwordPlaceholder")}
+										{...field}
+										suppressHydrationWarning
+									/>
 								</FormControl>
 								<FormMessage />
 							</FormItem>

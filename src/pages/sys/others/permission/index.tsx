@@ -1,4 +1,5 @@
-import { USER_LIST } from "@/_mock/assets_backup";
+import { Link } from "react-router";
+import { USER_LIST } from "@/_mock/assets";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { useAuthCheck } from "@/components/auth/use-auth";
 import { CodeBlock } from "@/components/code/code-bock";
@@ -7,7 +8,6 @@ import { Button } from "@/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/ui/tabs";
 import { Text } from "@/ui/typography";
-import { Link } from "react-router";
 
 const Component_Auth_1 = `
 <AuthGuard
@@ -87,9 +87,9 @@ export default function PermissionPage() {
 
 	const handleSwitch = (_username: string) => {
 		if (_username === username) return;
-		const user = USER_LIST.find((user) => user.username === _username);
+		const user = USER_LIST.find((u) => u.username === _username);
 		if (user) {
-			signIn({ username: user.username, password: user.password });
+			signIn({ email: user.email, password: user.password });
 		}
 	};
 	return (

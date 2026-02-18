@@ -1,34 +1,48 @@
-import userService from "@/api/services/userService";
+import authService, { type AuthRegisterReq } from "@/api/services/authService";
 import { Button } from "@/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { ReturnButton } from "./components/ReturnButton";
 import { LoginStateEnum, useLoginStateContext } from "./providers/login-provider";
+
+type RegisterFormValues = AuthRegisterReq & { confirmPassword: string };
 
 function RegisterForm() {
 	const { t } = useTranslation();
 	const { loginState, backToLogin } = useLoginStateContext();
 
 	const signUpMutation = useMutation({
-		mutationFn: userService.signup,
+		mutationFn: authService.register,
 	});
 
-	const form = useForm({
+	const form = useForm<RegisterFormValues>({
 		defaultValues: {
-			username: "",
 			email: "",
 			password: "",
+			firstName: "",
+			lastName: "",
 			confirmPassword: "",
 		},
 	});
 
-	const onFinish = async (values: any) => {
-		console.log("Received values of form: ", values);
-		await signUpMutation.mutateAsync(values);
-		backToLogin();
+	const onFinish = async (values: RegisterFormValues) => {
+		try {
+			await signUpMutation.mutateAsync({
+				email: values.email,
+				password: values.password,
+				firstName: values.firstName || undefined,
+				lastName: values.lastName || undefined,
+			});
+			toast.success(t("sys.login.registerSuccess") || "Registration successful. Please check your email.");
+			backToLogin();
+		} catch (err: unknown) {
+			const message = err instanceof Error ? err.message : "Registration failed";
+			toast.error(message);
+		}
 	};
 
 	if (loginState !== LoginStateEnum.REGISTER) return null;
@@ -42,12 +56,12 @@ function RegisterForm() {
 
 				<FormField
 					control={form.control}
-					name="username"
-					rules={{ required: t("sys.login.accountPlaceholder") }}
+					name="email"
+					rules={{ required: t("sys.login.emaildPlaceholder") }}
 					render={({ field }) => (
 						<FormItem>
 							<FormControl>
-								<Input placeholder={t("sys.login.userName")} {...field} />
+								<Input type="email" placeholder={t("sys.login.email")} {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -56,12 +70,24 @@ function RegisterForm() {
 
 				<FormField
 					control={form.control}
-					name="email"
-					rules={{ required: t("sys.login.emaildPlaceholder") }}
+					name="firstName"
 					render={({ field }) => (
 						<FormItem>
 							<FormControl>
-								<Input placeholder={t("sys.login.email")} {...field} />
+								<Input placeholder={t("sys.login.firstName") || "First name"} {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="lastName"
+					render={({ field }) => (
+						<FormItem>
+							<FormControl>
+								<Input placeholder={t("sys.login.lastName") || "Last name"} {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>

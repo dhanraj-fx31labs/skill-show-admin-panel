@@ -21,6 +21,6 @@ export type TranExitType = {
 
 export type BackgroundType = {
 	duration?: number;
-	ease?: [];
+	ease?: "linear" | "easeIn" | "easeOut" | "easeInOut";
 	colors?: string[];
 };

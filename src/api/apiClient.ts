@@ -1,35 +1,49 @@
+import axios, { type AxiosError, type AxiosRequestConfig, type AxiosResponse } from "axios";
+import { toast } from "sonner";
+import { ResultStatus } from "#/enum";
 import { GLOBAL_CONFIG } from "@/global-config";
 import { t } from "@/locales/i18n";
 import userStore from "@/store/userStore";
-import axios, { type AxiosRequestConfig, type AxiosError, type AxiosResponse } from "axios";
-import { toast } from "sonner";
-import type { Result } from "#/api";
-import { ResultStatus } from "#/enum";
+
+const HTTP_OK = 200;
+const HTTP_CREATED = 201;
+
+/** Backend may return status 200/201; frontend mock uses ResultStatus (0) */
+type ApiResponseBody = {
+	status: number;
+	message?: string;
+	data?: unknown;
+};
 
 const axiosInstance = axios.create({
-	baseURL: GLOBAL_CONFIG.apiBaseUrl,
+	baseURL: GLOBAL_CONFIG.backendUrl,
 	timeout: 50000,
 	headers: { "Content-Type": "application/json;charset=utf-8" },
 });
 
 axiosInstance.interceptors.request.use(
 	(config) => {
-		config.headers.Authorization = "Bearer Token";
+		const accessToken = userStore.getState().userToken?.accessToken;
+		if (accessToken) {
+			config.headers.Authorization = `Bearer ${accessToken}`;
+		}
 		return config;
 	},
 	(error) => Promise.reject(error),
 );
 
 axiosInstance.interceptors.response.use(
-	(res: AxiosResponse<Result<any>>) => {
+	(res: AxiosResponse<ApiResponseBody>) => {
 		if (!res.data) throw new Error(t("sys.api.apiRequestFailed"));
-		const { status, data, message } = res.data;
-		if (status === ResultStatus.SUCCESS) {
-			return data;
+		const body = res.data;
+		const status = body.status;
+		const isSuccess = status === ResultStatus.SUCCESS || status === HTTP_OK || status === HTTP_CREATED;
+		if (isSuccess) {
+			return { ...res, data: body.data };
 		}
-		throw new Error(message || t("sys.api.apiRequestFailed"));
+		throw new Error(body.message || t("sys.api.apiRequestFailed"));
 	},
-	(error: AxiosError<Result>) => {
+	(error: AxiosError<{ message?: string }>) => {
 		const { response, message } = error || {};
 		const errMsg = response?.data?.message || message || t("sys.api.errorMessage");
 		toast.error(errMsg, { position: "top-center" });
@@ -53,8 +67,9 @@ class APIClient {
 	delete<T = unknown>(config: AxiosRequestConfig): Promise<T> {
 		return this.request<T>({ ...config, method: "DELETE" });
 	}
-	request<T = unknown>(config: AxiosRequestConfig): Promise<T> {
-		return axiosInstance.request<any, T>(config);
+	async request<T = unknown>(config: AxiosRequestConfig): Promise<T> {
+		const res = await axiosInstance.request(config);
+		return (res as AxiosResponse<{ data: T }>).data as T;
 	}
 }
 
