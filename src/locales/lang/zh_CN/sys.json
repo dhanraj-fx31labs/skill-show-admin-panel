@@ -1,5 +1,6 @@
 {
 	"sys": {
+		"Home": "首页",
 		"api": {
 			"operationSuccess": "操作成功",
 			"operationFailed": "操作失败",
@@ -84,6 +85,7 @@
 			"closeRight": "关闭右侧标签页"
 		},
 		"nav": {
+			"home": "首页",
 			"dashboard": "仪表板",
 			"pages": "页面",
 			"others": "其他",

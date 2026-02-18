@@ -5,6 +5,8 @@ import { useMatches, useNavigate } from "react-router";
 import { useFlattenedRoutes, usePathname, usePermissionRoutes, useRouteToMenuFn } from "@/router/hooks";
 import { menuFilter } from "@/router/utils";
 import { useSettingActions, useSettings } from "@/store/settingStore";
+import { Button } from "@/ui/button";
+import { Icon } from "@/components/icon";
 
 import { NAV_WIDTH } from "../config";
 
@@ -16,6 +18,8 @@ const { Sider } = Layout;
 
 type Props = {
 	closeSideBarDrawer?: () => void;
+	/** When true, render for mobile drawer (no Sider, no collapse) */
+	isDrawer?: boolean;
 };
 export default function NavVertical(props: Props) {
 	const navigate = useNavigate();
@@ -134,6 +138,43 @@ export default function NavVertical(props: Props) {
 		return darkSidebar ? "dark" : "light";
 	}, [themeMode, darkSidebar]);
 
+	const content = (
+		<div className="flex h-full flex-col min-h-0">
+			<NavLogo
+				collapsed={collapsed}
+				onToggle={handleToggleCollapsed}
+				variant={props.isDrawer ? "drawer" : "sidebar"}
+				rightSlot={
+					props.isDrawer && props.closeSideBarDrawer ? (
+						<Button
+							variant="ghost"
+							size="icon"
+							className="size-9 rounded-lg shrink-0"
+							onClick={props.closeSideBarDrawer}
+							aria-label="Close menu"
+						>
+							<Icon icon="solar:close-circle-bold" size={22} />
+						</Button>
+					) : undefined
+				}
+			/>
+			<Menu
+				mode="inline"
+				items={menuList}
+				theme={sidebarTheme}
+				selectedKeys={selectedKeys}
+				openKeys={openKeys}
+				onOpenChange={handleOpenChange}
+				className="border-none! min-h-0 flex-1 overflow-y-auto"
+				onClick={onClick}
+			/>
+		</div>
+	);
+
+	if (props.isDrawer) {
+		return <div className="flex h-full flex-col bg-background">{content}</div>;
+	}
+
 	return (
 		<Sider
 			trigger={null}
@@ -143,20 +184,7 @@ export default function NavVertical(props: Props) {
 			theme={sidebarTheme}
 			className="fixed! left-0 top-0 h-screen border-r border-dashed"
 		>
-			<div className="flex h-full flex-col">
-				<NavLogo collapsed={collapsed} onToggle={handleToggleCollapsed} />
-
-				<Menu
-					mode="inline"
-					items={menuList}
-					theme={sidebarTheme}
-					selectedKeys={selectedKeys}
-					openKeys={openKeys}
-					onOpenChange={handleOpenChange}
-					className="border-none!"
-					onClick={onClick}
-				/>
-			</div>
+			{content}
 		</Sider>
 	);
 }

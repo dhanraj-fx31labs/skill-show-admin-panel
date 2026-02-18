@@ -96,7 +96,11 @@ function MobileForm() {
 						<FormItem>
 							<FormLabel className="flex items-center justify-between">
 								<span className="text-sm">{t("sys.login.smsCode")}</span>
-								<span className="text-sm text-muted-foreground" onClick={start}>
+								<button
+									type="button"
+									className="text-sm text-muted-foreground cursor-pointer bg-transparent border-0 p-0"
+									onClick={start}
+								>
 									{countdown === 0 ? (
 										<span>{t("sys.login.sendSmsButton")}</span>
 									) : (
@@ -112,7 +116,7 @@ function MobileForm() {
 											<span className="ml-1">{t("sys.login.sendSmsText", { second })}</span>
 										</div>
 									)}
-								</span>
+								</button>
 							</FormLabel>
 							<FormControl>
 								<InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS_AND_CHARS} {...field}>

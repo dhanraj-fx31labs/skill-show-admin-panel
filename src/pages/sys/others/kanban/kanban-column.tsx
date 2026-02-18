@@ -51,54 +51,40 @@ export default function KanbanColumn({
 		{
 			key: "1",
 			label: (
-				<div
-					className="flex items-center text-gray"
-					onClick={() => {
-						setRenamingTask(true);
-					}}
-					onKeyDown={(e) => {
-						if (e.key === "Enter") {
-							setRenamingTask(true);
-						}
-					}}
+				<button
+					type="button"
+					className="flex items-center text-gray cursor-pointer border-0 bg-transparent p-0 w-full"
+					onClick={() => setRenamingTask(true)}
 				>
 					<Icon icon="solar:pen-bold" />
 					<span className="ml-2">rename</span>
-				</div>
+				</button>
 			),
 		},
 		{
 			key: "2",
 			label: (
-				<div
-					className="flex items-center text-gray"
+				<button
+					type="button"
+					className="flex items-center text-gray cursor-pointer border-0 bg-transparent p-0 w-full"
 					onClick={() => clearColumn(column.id)}
-					onKeyDown={(e) => {
-						if (e.key === "Enter") {
-							clearColumn(column.id);
-						}
-					}}
 				>
 					<Icon icon="solar:eraser-bold" />
 					<span className="ml-2">clear</span>
-				</div>
+				</button>
 			),
 		},
 		{
 			key: "3",
 			label: (
-				<div
-					className="flex items-center text-warning"
+				<button
+					type="button"
+					className="flex items-center text-warning cursor-pointer border-0 bg-transparent p-0 w-full"
 					onClick={() => deleteColumn(column.id)}
-					onKeyDown={(e) => {
-						if (e.key === "Enter") {
-							deleteColumn(column.id);
-						}
-					}}
 				>
 					<Icon icon="solar:trash-bin-trash-bold" />
 					<span className="ml-2">delete</span>
-				</div>
+				</button>
 			),
 		},
 	];

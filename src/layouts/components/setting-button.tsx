@@ -23,7 +23,8 @@ import { type ThemeColorPresets, ThemeLayout, ThemeMode } from "#/enum";
 export default function SettingButton() {
 	const { t } = useTranslation();
 	const settings = useSettings();
-	const { themeMode, themeColorPresets, themeLayout, themeStretch, breadCrumb, fontSize, fontFamily,multiTab } = settings;
+	const { themeMode, themeColorPresets, themeLayout, themeStretch, breadCrumb, fontSize, fontFamily, multiTab } =
+		settings;
 	const { setSettings } = useSettingActions();
 
 	const updateSettings = (partialSettings: Partial<SettingsType>) => {
@@ -262,10 +263,11 @@ export default function SettingButton() {
 							<Text variant="subTitle1">{t("sys.settings.presetThemes")}</Text>
 							<div className="flex flex-wrap gap-1">
 								{Object.entries(presetsColors).map(([preset, color]) => (
-									<div
+									<button
 										key={preset}
+										type="button"
 										className={cn(
-											"relative flex h-13 w-5 cursor-pointer items-center justify-center rounded transition-all duration-300 ease-in-out p-1",
+											"relative flex h-13 w-5 cursor-pointer items-center justify-center rounded transition-all duration-300 ease-in-out p-1 border-0",
 											themeColorPresets === preset && "w-13",
 										)}
 										style={{ backgroundColor: color.default }}
@@ -279,7 +281,7 @@ export default function SettingButton() {
 										>
 											{themeColorPresets === preset && <Icon icon="bi:check-all" size={24} color="white" />}
 										</div>
-									</div>
+									</button>
 								))}
 							</div>
 						</div>
@@ -347,11 +349,9 @@ export default function SettingButton() {
 						variant="outline"
 						className="w-full border-dashed text-text-primary hover:border-primary hover:text-primary"
 						onClick={toggleFullScreen}
+						aria-label={isFullscreen ? t("sys.settings.exitFullscreen") : t("sys.settings.fullscreen")}
 					>
-						<div
-							className="flex items-center justify-center"
-							aria-label={isFullscreen ? t("sys.settings.exitFullscreen") : t("sys.settings.fullscreen")}
-						>
+						<div className="flex items-center justify-center">
 							{isFullscreen ? (
 								<>
 									<Icon icon="local:ic-settings-exit-fullscreen" />

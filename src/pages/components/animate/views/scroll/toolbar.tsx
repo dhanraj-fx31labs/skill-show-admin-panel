@@ -5,8 +5,12 @@ type Props = {
 };
 export default function Toolbar({ onRefresh }: Props) {
 	return (
-		<div className="mb-4 flex items-center justify-end" onClick={onRefresh}>
-			<Icon icon="material-symbols:refresh" className="cursor-pointer" size={24} />
-		</div>
+		<button
+			type="button"
+			className="mb-4 flex items-center justify-end cursor-pointer border-0 bg-transparent p-0"
+			onClick={onRefresh}
+		>
+			<Icon icon="material-symbols:refresh" size={24} />
+		</button>
 	);
 }

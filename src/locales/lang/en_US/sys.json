@@ -1,5 +1,6 @@
 {
 	"sys": {
+		"Home": "Home",
 		"api": {
 			"apiRequestFailed": "The interface request failed, please try again later!",
 			"apiTimeoutMessage": "The interface request timed out, please refresh the page and try again!",
@@ -70,6 +71,7 @@
 			"noAccount": "Don't have an account?"
 		},
 		"nav": {
+			"home": "Home",
 			"dashboard": "Dashboard",
 			"pages": "Pages",
 			"others": "Others",

@@ -12,11 +12,22 @@ import { flattenTrees } from "@/utils/tree";
 import { getRoutesFromModules } from "../utils";
 
 const ENTRY_PATH = "/src/pages";
+const ENTRY_PATH_NO_LEADING = "src/pages";
 const PAGES = import.meta.glob<{ default: React.ComponentType }>("/src/pages/**/*.tsx");
 
 function loadComponentFromPath(path: string): (() => Promise<{ default: React.ComponentType }>) | undefined {
-	const loader = PAGES[`${ENTRY_PATH}/${path}`];
-	return typeof loader === "function" ? loader : undefined;
+	const normalized = path.replace(/^\//, "");
+	const keysToTry = [
+		`${ENTRY_PATH}/${normalized}`,
+		`${ENTRY_PATH_NO_LEADING}/${normalized}`,
+		path.startsWith("/") ? path : `/${path}`,
+		path.startsWith("src/") ? path : `src/pages/${normalized}`,
+	];
+	for (const key of keysToTry) {
+		const loader = PAGES[key];
+		if (typeof loader === "function") return loader;
+	}
+	return undefined;
 }
 
 /**
@@ -118,7 +129,11 @@ const createMenuRoute = (permission: Permission, flattenedPermissions: Permissio
 	const baseRoute = createBaseRoute(permission, buildCompleteRoute(permission, flattenedPermissions));
 
 	if (permission.component) {
-		const loader = loadComponentFromPath(permission.component);
+		const componentPath =
+			typeof permission.component === "string" && permission.component.startsWith("/")
+				? permission.component.slice(1)
+				: (permission.component as string);
+		const loader = loadComponentFromPath(componentPath);
 		if (loader) {
 			const Element = lazy(loader);
 			if (permission.frameSrc) {
@@ -131,6 +146,14 @@ const createMenuRoute = (permission: Permission, flattenedPermissions: Permissio
 				);
 			}
 		}
+	}
+
+	if (!baseRoute.element) {
+		baseRoute.element = (
+			<Suspense fallback={<LineLoading />}>
+				<Outlet />
+			</Suspense>
+		);
 	}
 
 	return baseRoute;

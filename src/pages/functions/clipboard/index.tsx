@@ -37,7 +37,13 @@ export default function ClipboardPage() {
 				</div>
 				<div>
 					<h5 className="mb-2 font-medium">ON DOUBLE CLICK</h5>
-					<div onDoubleClick={() => copyFn(textOnClick)}>{textOnClick}</div>
+					<button
+						type="button"
+						className="text-left bg-transparent border-0 p-0"
+						onDoubleClick={() => copyFn(textOnClick)}
+					>
+						{textOnClick}
+					</button>
 				</div>
 			</CardContent>
 		</Card>

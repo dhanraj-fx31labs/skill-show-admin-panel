@@ -4,15 +4,14 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { MenuTree, Permission, Role, UserInfo, UserToken } from "#/entity";
 import { BasicStatus, type PermissionType, StorageEnum } from "#/enum";
-import authService, { type AuthLoginReq, type AuthUserProfile } from "@/api/services/authService";
+import authService, {
+	type AuthLoginReq,
+	type AuthUserProfile,
+	type AuthPermissionNode,
+} from "@/api/services/authService";
 
-function mapAuthProfileToUserInfo(profile: AuthUserProfile): UserInfo {
-	const roles: Role[] = (profile.roles || []).map((r) => ({
-		id: r.id,
-		name: r.name,
-		code: r.name,
-	}));
-	const mapNodeToPermission = (n: AuthUserProfile["permissionTree"][0]): Permission => ({
+function mapNodeToPermission(n: AuthPermissionNode): Permission {
+	return {
 		id: n.id,
 		parentId: n.parentId ?? undefined,
 		name: n.name,
@@ -26,13 +25,15 @@ function mapAuthProfileToUserInfo(profile: AuthUserProfile): UserInfo {
 		code: n.name,
 		read: n.read,
 		create: n.create,
-		can_update: n.update,
+		can_update: n.update ?? n.can_update,
 		delete: n.delete,
 		is_user_specific: n.isUserSpecific,
 		children: n.children?.map(mapNodeToPermission),
-	});
-	const permissions: Permission[] = (profile.permissionTree || []).map(mapNodeToPermission);
-	const mapNodeToMenuTree = (n: AuthUserProfile["permissionTree"][0]): MenuTree => ({
+	};
+}
+
+function mapNodeToMenuTree(n: AuthPermissionNode): MenuTree {
+	return {
 		id: n.id,
 		parentId: n.parentId ?? "",
 		name: n.name,
@@ -44,8 +45,20 @@ function mapAuthProfileToUserInfo(profile: AuthUserProfile): UserInfo {
 		component: n.component ?? undefined,
 		hidden: n.hide ?? undefined,
 		children: n.children?.map(mapNodeToMenuTree),
-	});
-	const menu: MenuTree[] = (profile.permissionTree || []).map(mapNodeToMenuTree);
+	};
+}
+
+function mapAuthProfileToUserInfo(profile: AuthUserProfile): UserInfo {
+	const roles: Role[] = (profile.roles || []).map((r) => ({
+		id: r.id,
+		name: r.name,
+		code: r.name,
+	}));
+
+	const sourceTree = profile.permissionTree ?? profile.permissions ?? profile.menu ?? [];
+	const permissions: Permission[] = sourceTree.map(mapNodeToPermission);
+	const menu: MenuTree[] = sourceTree.map(mapNodeToMenuTree);
+
 	const username =
 		profile.displayName ||
 		(profile.firstName || profile.lastName

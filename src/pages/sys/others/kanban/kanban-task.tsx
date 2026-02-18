@@ -34,7 +34,11 @@ function KanbanTask({ id, task, isDragging }: Props) {
 			<Container ref={setNodeRef} style={style} {...attributes} {...listeners} $isDragging={!!isDragging}>
 				<div>
 					{attachments.length > 0 && <img src={attachments[0]} alt="" className="mb-4 rounded-md" />}
-					<div onClick={() => setDrawerOpen(true)}>
+					<button
+						type="button"
+						className="cursor-pointer w-full text-left border-0 bg-transparent p-0"
+						onClick={() => setDrawerOpen(true)}
+					>
 						<div className="flex justify-end">
 							<TaskPrioritySvg taskPriority={priority} />
 						</div>
@@ -58,7 +62,7 @@ function KanbanTask({ id, task, isDragging }: Props) {
 								</div>
 							)}
 						</div>
-					</div>
+					</button>
 				</div>
 			</Container>
 

@@ -31,7 +31,7 @@ export function LoginProvider({ children }: PropsWithChildren) {
 		setLoginState(LoginStateEnum.LOGIN);
 	}
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	// biome-ignore lint/correctness/useExhaustiveDependencies: setLoginState and backToLogin are stable
 	const value: LoginStateContextType = useMemo(() => ({ loginState, setLoginState, backToLogin }), [loginState]);
 
 	return <LoginStateContext.Provider value={value}>{children}</LoginStateContext.Provider>;

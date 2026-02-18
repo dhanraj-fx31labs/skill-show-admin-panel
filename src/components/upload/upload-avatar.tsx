@@ -47,7 +47,9 @@ export function UploadAvatar({ helperText, defaultAvatar = "", ...other }: Props
 	);
 
 	const renderContent = (
+		// biome-ignore lint/a11y/useSemanticElements: layout container for hover, not form grouping
 		<div
+			role="group"
 			className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-full"
 			onMouseEnter={() => handelHover(true)}
 			onMouseLeave={() => handelHover(false)}

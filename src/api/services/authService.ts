@@ -36,6 +36,8 @@ export interface AuthPermissionNode {
 	create?: boolean;
 	read?: boolean;
 	update?: boolean;
+	/** Some backends send can_update instead of update */
+	can_update?: boolean;
 	delete?: boolean;
 	isUserSpecific?: boolean;
 	children?: AuthPermissionNode[];
@@ -48,7 +50,7 @@ export interface AuthRoleInfo {
 	description?: string;
 }
 
-/** Backend user profile in login response */
+/** Backend user profile in login response. May include permissionTree or permissions+menu. */
 export interface AuthUserProfile {
 	id: string;
 	email: string;
@@ -58,7 +60,10 @@ export interface AuthUserProfile {
 	isActive: boolean;
 	isEmailVerified: boolean;
 	roles: AuthRoleInfo[];
-	permissionTree: AuthPermissionNode[];
+	permissionTree?: AuthPermissionNode[];
+	/** When backend returns permissions/menu directly instead of permissionTree */
+	permissions?: AuthPermissionNode[];
+	menu?: AuthPermissionNode[];
 }
 
 export interface AuthLoginRes {

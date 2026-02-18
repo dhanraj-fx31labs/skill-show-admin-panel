@@ -10,10 +10,10 @@ export function useTabLabelRender() {
 		() => ({
 			"sys.nav.system.user_detail": (tab: KeepAliveTab) => {
 				const userId = tab.params?.id;
-				const defaultLabel = t(tab.label);
+				const defaultLabel = t(tab.label) !== tab.label ? t(tab.label) : (tab.label ?? "User Detail");
 				if (userId) {
-					const user = USER_LIST.find((item) => item.id === userId);
-					return `${user?.username}-${defaultLabel}`;
+					const user = USER_LIST?.find((item) => item.id === userId);
+					return user ? `${user.username}-${defaultLabel}` : `${userId}-${defaultLabel}`;
 				}
 				return defaultLabel;
 			},
@@ -26,7 +26,8 @@ export function useTabLabelRender() {
 		if (specialRender) {
 			return specialRender(tab);
 		}
-		return t(tab.label);
+		const translated = t(tab.label);
+		return translated !== tab.label ? translated : (tab.label ?? "Home");
 	};
 
 	return renderTabLabel;

@@ -27,7 +27,7 @@ export default function ScrollProgressView() {
 					<ScrollProgress scrollYProgress={containerProgress.scrollYProgress} />
 					<div ref={containerProgress.elementRef} className="h-80 overflow-auto">
 						{[...Array(4)].map((_, index) => (
-							// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+							// biome-ignore lint/suspicious/noArrayIndexKey: list items have no stable id
 							<div key={index}>{TEXT}</div>
 						))}
 					</div>

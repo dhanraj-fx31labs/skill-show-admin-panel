@@ -27,7 +27,19 @@ export default function NoticeButton() {
 
 	return (
 		<>
-			<div className="relative" onClick={() => setDrawerOpen(true)}>
+			{/* biome-ignore lint/a11y/useSemanticElements: wrapper avoids nested buttons (inner is Button) */}
+			<div
+				className="relative"
+				role="button"
+				tabIndex={0}
+				onClick={() => setDrawerOpen(true)}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						setDrawerOpen(true);
+					}
+				}}
+			>
 				<Button variant="ghost" size="icon" className="rounded-full" onClick={() => setDrawerOpen(true)}>
 					<Icon icon="solar:bell-bing-bold-duotone" size={24} />
 				</Button>

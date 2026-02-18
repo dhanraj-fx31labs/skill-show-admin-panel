@@ -1,3 +1,5 @@
+import { useCurrentRouteMeta } from "@/router/hooks";
+import { useLocation } from "react-router";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useTabOperations } from "../hooks/use-tab-operations";
 import type { KeepAliveTab, MultiTabsContextType } from "../types";
@@ -16,47 +18,32 @@ const MultiTabsContext = createContext<MultiTabsContextType>({
 
 export function MultiTabsProvider({ children }: { children: React.ReactNode }) {
 	const [tabs, setTabs] = useState<KeepAliveTab[]>([]);
-	const currentRouteMeta = {
-		key: "/",
-		label: "Home",
-		hideTab: false,
-		children: null,
-		outlet: null,
-		params: {},
-	};
+	const currentRouteMeta = useCurrentRouteMeta();
+	const { pathname } = useLocation();
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	const activeTabRoutePath = useMemo(() => {
-		if (!currentRouteMeta) return "";
-		const { key } = currentRouteMeta;
-		return key;
-	}, [currentRouteMeta]);
+	const activeTabRoutePath = pathname;
 
 	const operations = useTabOperations(tabs, setTabs, activeTabRoutePath);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
-		if (!currentRouteMeta) return;
+		if (!currentRouteMeta || currentRouteMeta.hideTab) return;
+
+		const key = currentRouteMeta.key;
+		const outlet = currentRouteMeta.outlet;
 
 		setTabs((prev) => {
 			const filtered = prev.filter((item) => !item.hideTab);
+			if (filtered.some((item) => item.key === key)) return prev;
 
-			const { key, outlet: children } = currentRouteMeta;
-
-			const isExisted = filtered.find((item) => item.key === key);
-			if (!isExisted) {
-				return [
-					...filtered,
-					{
-						...currentRouteMeta,
-						key,
-						children,
-						timeStamp: new Date().getTime().toString(),
-					},
-				];
-			}
-
-			return filtered;
+			return [
+				...filtered,
+				{
+					...currentRouteMeta,
+					key,
+					children: outlet,
+					timeStamp: Date.now().toString(),
+				},
+			];
 		});
 	}, [currentRouteMeta]);
 

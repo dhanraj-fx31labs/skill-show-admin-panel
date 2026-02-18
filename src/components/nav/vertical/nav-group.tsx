@@ -29,22 +29,34 @@ function Group({ name, open, onClick }: { name?: string; open: boolean; onClick:
 	const { t } = useLocale();
 	return (
 		name && (
-			<div
+			<button
+				type="button"
 				className={cn(
-					"group w-full inline-flex items-center justify-start relative gap-2 cursor-pointer pt-4 pr-2 pb-2 pl-3 transition-all duration-300 ease-in-out",
+					"group w-full inline-flex items-center justify-start relative gap-2 cursor-pointer pt-4 pr-2 pb-2 pl-3 transition-all duration-300 ease-in-out border-0 bg-transparent p-0 text-left",
 					"hover:pl-4",
 				)}
 				onClick={() => onClick(!open)}
 			>
 				<Icon
 					icon="eva:arrow-ios-forward-fill"
-					className={cn("absolute left-[-4px] h-4 w-4 inline-flex shrink-0 transition-all duration-300 ease-in-out", "opacity-0 group-hover:opacity-100", {
-						"rotate-90": open,
-					})}
+					className={cn(
+						"absolute left-[-4px] h-4 w-4 inline-flex shrink-0 transition-all duration-300 ease-in-out",
+						"opacity-0 group-hover:opacity-100",
+						{
+							"rotate-90": open,
+						},
+					)}
 				/>
 
-				<span className={cn("text-xs font-medium transition-all duration-300 ease-in-out text-text-disabled", "hover:text-text-primary")}>{t(name)}</span>
-			</div>
+				<span
+					className={cn(
+						"text-xs font-medium transition-all duration-300 ease-in-out text-text-disabled",
+						"hover:text-text-primary",
+					)}
+				>
+					{t(name)}
+				</span>
+			</button>
 		)
 	);
 }
